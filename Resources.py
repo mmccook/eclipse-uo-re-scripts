@@ -38,20 +38,24 @@ default_options = {
 def Mine(current_runebook, location, options=default_options):
     CheckWeight(current_runebook, location, options)
     Journal.Clear()
-    shovel = FindItem(tool_ids["shovel"], Player.Backpack)
-    Target.TargetResource(shovel,"ore")
-    Misc.Pause(options["mining_delay"])
-    if (Journal.Search(journal_strings["noMetal"])):
+    try:
+        shovel = FindItem(tool_ids["shovel"], Player.Backpack)
+        Target.TargetResource(shovel,"ore")
+        Misc.Pause(options["mining_delay"])
+        if (Journal.Search(journal_strings["noMetal"])):
+            if(debug):
+                Misc.SendMessage("No Metal Found")
+            if Target.HasTarget(): Target.Cancel()
+        if (Journal.Search("dig some") or Journal.Search("put some") or Journal.Search("loosen") or Journal.Search("have found") or Journal.Search("extract a")):
+            Journal.Clear()
+            while not(Journal.Search(journal_strings["noMetal"]) or Journal.Search(journal_strings["youcant"]) or Journal.Search(journal_strings["cantseen"])):
+                CheckWeight(current_runebook, location,options)
+                shovel = FindItem(tool_ids["shovel"], Player.Backpack)
+                Target.TargetResource(shovel,"ore")
+                Misc.Pause(options["mining_delay"])
+    except:
         if(debug):
-            Misc.SendMessage("No Metal Found")
-        if Target.HasTarget(): Target.Cancel()
-    if (Journal.Search("dig some") or Journal.Search("put some") or Journal.Search("loosen") or Journal.Search("have found") or Journal.Search("extract a")):
-        Journal.Clear()
-        while not(Journal.Search(journal_strings["noMetal"]) or Journal.Search(journal_strings["youcant"]) or Journal.Search(journal_strings["cantseen"])):
-            CheckWeight(current_runebook, location,options)
-            shovel = FindItem(tool_ids["shovel"], Player.Backpack)
-            Target.TargetResource(shovel,"ore")
-            Misc.Pause(options["mining_delay"])
+            Misc.SendMessage("No Shovels");
                    
 def CheckWeight(current_runebook, location, options=default_options):
     if ( Player.Weight >= (Player.MaxWeight * 0.95) ):
