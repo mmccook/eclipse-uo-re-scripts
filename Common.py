@@ -64,12 +64,11 @@ def filterToon():
 def filterEnemy():
     enemyFilter = Mobiles.Filter()
     enemyFilter.Enabled = True
-    enemyFilter.RangeMin = 0
-    enemyFilter.RangeMax = 15
-    enemyFilter.IsHuman = False
+    enemyFilter.RangeMin = -1
+    enemyFilter.RangeMax = 12
+    enemyFilter.CheckIgnoreObject = True
     enemyFilter.Friend = False
-    enemyFilter.Notorieties = List[Byte](bytes([5, 6]))
-
+    enemyFilter.Notorieties = List[Byte](bytes([4, 5, 6]))
     return enemyFilter
 
 

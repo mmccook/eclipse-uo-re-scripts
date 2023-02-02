@@ -141,6 +141,7 @@ class Lumberjacking():
             Misc.SendMessage('--> Reached TreeSpot: %i, %i' % (tree.x, tree.y), 77)
 
     def CutTree(self):
+        Journal.Clear()
         if Target.HasTarget():
             if (debug):
                 Misc.SendMessage('--> Detected block, canceling target!', 77)
@@ -149,8 +150,8 @@ class Lumberjacking():
         self.CheckWeight()
         self.MoveToTree()
         self.CheckForEnemies()
-        Journal.Clear()
         self.EquipAxe()
+
         Items.UseItem(Player.GetItemOnLayer(left_hand_layer))
         Target.WaitForTarget(wait_for_target_timeout, True)
         Target.TargetExecute(self.trees[0].x, self.trees[0].y, self.trees[0].z, self.trees[0].id)
@@ -169,27 +170,12 @@ class Lumberjacking():
                     Misc.SendMessage('--> Possible block detected tree change', 77)
             else:
                 self.CutTree()
-        elif Journal.Search('bloodwood'):
-            if (debug):
-                Player.HeadMessage(1194, 'BLOODWOOD!')
-            Timer.Create('chopTimer', chop_timer_delay)
-            self.CutTree()
-        elif Journal.Search('heartwood'):
-            if (debug):
-                Player.HeadMessage(1193, 'HEARTWOOD!')
-            Timer.Create('chopTimer', chop_timer_delay)
-            self.CutTree()
-        elif Journal.Search('frostwood'):
-            if (debug):
-                Player.HeadMessage(1151, 'FROSTWOOD!')
-            Timer.Create('chopTimer', chop_timer_delay)
-            self.CutTree()
         elif Timer.Check('chopTimer') == False:
             if (debug):
                 Misc.SendMessage('--> Tree change', 77)
         else:
             self.CutTree()
-            Misc.Pause(1000)
+        Misc.Pause(1000)
 
     def EquipAxe(self):
         hasAxeEquipped = False
@@ -264,33 +250,33 @@ class Lumberjacking():
                 Misc.Pause(drag_delay * 2)
 
     def CheckForEnemies(self):
-        filter = filterEnemy()
-        enemies = Mobiles.ApplyFilter(filter)
-        print(enemies)
-        if enemies != None:
-            Timer.Create('Fight', 2500)
-            for enemy in enemies:
-                print(enemy)
-                enemyMobile = Mobiles.FindBySerial(enemy.Serial)
-                print(enemyMobile)
-                if enemyMobile:
-                    if Player.DistanceTo(enemyMobile) > 1:
-                        enemyPosition = enemyMobile.Position
-                        enemyCoords = PathFinding.Route()
-                        enemyCoords.MaxRetry = 5
-                        enemyCoords.StopIfStuck = False
-                        enemyCoords.X = enemyMobile.X
-                        enemyCoords.Y = enemyMobile.Y - 1
-                        PathFinding.Go(enemyCoords)
-                        Misc.ScriptRun(self.options['attack_script_name'])
-                    elif Timer.Check('Fight') == False:
-                        Misc.ScriptRun(self.options['attack_script_name'])
-                        Timer.Create('Fight', 2500)
+        enemies = Mobiles.ApplyFilter(filterEnemy())
+        if debug:
+            print("{} Enemies nearby".format(len(enemies)))
+        Timer.Create('Fight', 2500)
+        for enemy in enemies:
+            enemyMobile = Mobiles.FindBySerial(enemy.Serial)
+            if debug:
+                print(enemyMobile.Name)
+            if enemyMobile:
+                if Player.DistanceTo(enemyMobile) > 1:
+                    enemyPosition = enemyMobile.Position
+                    enemyCoords = PathFinding.Route()
+                    enemyCoords.MaxRetry = 5
+                    enemyCoords.StopIfStuck = False
+                    enemyCoords.X = enemyMobile.Position.X
+                    enemyCoords.Y = enemyMobile.Position.Y - 1
+                    PathFinding.Go(enemyCoords)
+                    Misc.ScriptRun(self.options['attack_script_name'])
+                elif Timer.Check('Fight') == False:
+                    Misc.ScriptRun(self.options['attack_script_name'])
+                    Timer.Create('Fight', 2500)
 
-        if (self.current_tree_pos and len(Mobiles.ApplyFilter(filter)) < 1):
+        if (self.current_tree_pos and len(Mobiles.ApplyFilter(filterEnemy())) < 1):
             PathFinding.Go(self.current_tree_pos)
 
     def Start(self):
+        Journal.Clear()
         if (debug):
             Misc.SendMessage('--> Starting Lumberjacking')
         self.EquipAxe()
@@ -298,6 +284,7 @@ class Lumberjacking():
         for runebookId in self.runebooks:
             self.current_runebook = Runebook(runebookId)
             while True:
+                Journal.Clear()
                 next = str(self.location)
                 didRecall = self.current_runebook.recall(next)
                 Misc.Pause(1000)
@@ -306,7 +293,8 @@ class Lumberjacking():
                     continue
                 self.ScanStatics()
                 i = 0
-                while self.trees.Count > 0:
+                while len(self.trees) > 0:
+                    Journal.Clear()
                     self.CheckForEnemies()
                     self.MoveToTree()
                     self.CutTree()
@@ -315,6 +303,7 @@ class Lumberjacking():
                     self.current_tree_pos = None
                 self.trees = []
                 self.location += 1
+
             Misc.Pause(1000)
 
 
