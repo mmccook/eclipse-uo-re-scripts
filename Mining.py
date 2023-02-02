@@ -39,7 +39,6 @@ class Mining():
                 if(debug):
                     Misc.SendMessage(str(inst))
                     Misc.SendMessage("No Shovels")
-        self.dbConn.commit()
 
     def CheckWeight(self):
         if ( Player.Weight >= (Player.MaxWeight * 0.95) ):
