@@ -1,7 +1,9 @@
 from System import Byte
 from System.Collections.Generic import List
+
 from Eclipse.Items import FindItem
-debug=True
+
+debug = True
 ## Colors for messages
 colors = {
     'green': 65,
@@ -22,6 +24,9 @@ tool_ids = {
 key_ids = {
     'master_key': 0x176B
 }
+drag_delay = 1050
+wait_for_target_timeout = 10000
+
 
 def FillFromMasterKey():
     try:
@@ -32,26 +37,41 @@ def FillFromMasterKey():
         Gumps.WaitForGump(3778238711, 10000)
         Gumps.CloseGump(3778238711)
     except ValueError as inst:
-        if(debug):
+        if (debug):
             Misc.SendMessage(str(inst))
 
+
 def go(x1, y1):
-    Coords = PathFinding.Route() 
+    Coords = PathFinding.Route()
     Coords.X = x1
     Coords.Y = y1
     Coords.MaxRetry = -1
     Coords.DebugMessage = debug
     PathFinding.Go(Coords)
 
+
 def filterToon():
     toonFilter = Mobiles.Filter()
     toonFilter.Enabled = True
     toonFilter.RangeMin = -1
     toonFilter.RangeMax = -1
-    toonFilter.IsHuman = True 
+    toonFilter.IsHuman = True
     toonFilter.Friend = False
-    toonFilter.Notorieties = List[Byte](bytes([1,2,3,4,5,6,7]))
+    toonFilter.Notorieties = List[Byte](bytes([1, 2, 3, 4, 5, 6, 7]))
     return toonFilter
+
+
+def filterEnemy():
+    enemyFilter = Mobiles.Filter()
+    enemyFilter.Enabled = True
+    enemyFilter.RangeMin = 0
+    enemyFilter.RangeMax = 15
+    enemyFilter.IsHuman = False
+    enemyFilter.Friend = False
+    enemyFilter.Notorieties = List[Byte](bytes([5, 6]))
+
+    return enemyFilter
+
 
 def filterInvuln():
     invulFilter = Mobiles.Filter()
@@ -62,28 +82,34 @@ def filterInvuln():
     invulFilter.Notorieties = List[Byte](bytes([7]))
     return invulFilter
 
+
 def BlessTarget(serial):
     Spells.CastMagery("Bless")
     Target.WaitForTarget(10000, False)
     Target.TargetExecute(serial)
-    
+
+
 def ArcaneEmpowermentSelf():
     Spells.CastSpellweaving("Arcane Empowerment")
     Misc.Pause(3000)
-    
+
+
 def AttunementSelf():
     Spells.CastSpellweaving("Attunement")
     Misc.Pause(500)
-    
+
+
 def GiftOfLifeTarget(serial):
     Spells.CastSpellweaving("Gift Of Life")
     Target.WaitForTarget(10000, False)
     Target.TargetExecute(serial)
 
+
 def GiftOfRenewalTarget(serial):
     Spells.CastSpellweaving("Gift Of Renewal")
     Target.WaitForTarget(10000, False)
     Target.TargetExecute(serial)
+
 
 def AfterCastPause():
     Misc.Pause(800)

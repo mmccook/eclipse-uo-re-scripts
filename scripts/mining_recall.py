@@ -1,6 +1,5 @@
 from Eclipse.Mining import Mining
 
-
 optionsOverride = {
     'mining_delay': 1050,
     'deposit_in_bank': False,
@@ -8,7 +7,7 @@ optionsOverride = {
     'smelt': False
 }
 
-if(optionsOverride["deposit_in_bank"]):
+if (optionsOverride["deposit_in_bank"]):
     oreBagSerial = Target.PromptTarget("Select the bank bag to deposit ore into")
     ingotBagSerial = Target.PromptTarget("Select the bank bag to deposit ingots into")
     Misc.SetSharedValue("oreBagSerial", oreBagSerial)
