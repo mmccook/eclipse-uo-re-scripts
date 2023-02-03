@@ -147,10 +147,6 @@ class Lumberjacking():
                 Misc.SendMessage('--> Detected block, canceling target!', 77)
             Target.Cancel()
             Misc.Pause(500)
-        self.CheckWeight()
-        self.MoveToTree()
-        self.CheckForEnemies()
-        self.EquipAxe()
 
         Items.UseItem(Player.GetItemOnLayer(left_hand_layer))
         Target.WaitForTarget(wait_for_target_timeout, True)
@@ -176,7 +172,15 @@ class Lumberjacking():
         else:
             self.CutTree()
         Misc.Pause(1000)
-
+    def Lumber(self):
+        self.CheckWeight()
+        self.MoveToTree()
+        self.CheckForEnemies()
+        self.EquipAxe()
+        self.CutTree()
+        self.trees.pop(0)
+        self.SortTreesByDistance()
+        self.current_tree_pos = None
     def EquipAxe(self):
         hasAxeEquipped = False
         left_hand_item = Player.GetItemOnLayer(left_hand_layer)
@@ -285,27 +289,20 @@ class Lumberjacking():
             self.current_runebook = Runebook(runebookId)
             while True:
                 Journal.Clear()
-                next = str(self.location)
-                didRecall = self.current_runebook.recall(next)
+                didRecall = self.current_runebook.recall(str(self.location))
                 Misc.Pause(1000)
                 if (not didRecall):
                     self.location += 1
                     continue
                 self.ScanStatics()
-                i = 0
                 while len(self.trees) > 0:
                     Journal.Clear()
                     self.CheckForEnemies()
                     self.MoveToTree()
-                    self.CutTree()
-                    self.trees.pop(0)
-                    self.SortTreesByDistance()
-                    self.current_tree_pos = None
+                    self.Lumber()
                 self.trees = []
                 self.location += 1
-
             Misc.Pause(1000)
-
 
 class Tree:
     x = None
