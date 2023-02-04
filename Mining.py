@@ -122,16 +122,11 @@ class Mining():
                 print(enemyMobile.Name)
             if enemyMobile:
                 if Player.DistanceTo(enemyMobile) > 1:
-                    enemyPosition = enemyMobile.Position
-                    enemyCoords = PathFinding.Route()
-                    enemyCoords.MaxRetry = 5
-                    enemyCoords.StopIfStuck = False
-                    enemyCoords.X = enemyMobile.Position.X
-                    enemyCoords.Y = enemyMobile.Position.Y - 1
-                    PathFinding.Go(enemyCoords)
-                    Misc.ScriptRun(self.options['attack_script_name'])
+                    if Misc.ScriptStatus(self.options['attack_script_name']):
+                        Misc.ScriptRun(self.options['attack_script_name'])
                 elif Timer.Check('Fight') == False:
-                    Misc.ScriptRun(self.options['attack_script_name'])
+                    if Misc.ScriptStatus(self.options['attack_script_name']):
+                        Misc.ScriptRun(self.options['attack_script_name'])
                     Timer.Create('Fight', 2500)
     def Start(self):
         Journal.Clear()
