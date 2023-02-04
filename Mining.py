@@ -1,6 +1,6 @@
 import random
 
-from Eclipse.Common import debug, tool_ids, FillFromMasterKey
+from Eclipse.Common import debug, tool_ids, FillFromMasterKey, filterEnemy
 from Eclipse.Items import FindItem
 from Eclipse.Resources import ore_bag_serial_name, ingot_bag_serial_name, static_runebooks_serial, default_options, \
     mining, journal_strings_mining
@@ -19,6 +19,7 @@ class Mining():
         no_metal_count = 0
         while no_metal_count < 3:
             self.CheckWeight()
+            self.CheckForEnemies()
             Journal.Clear()
             try:
                 shovel = FindItem(tool_ids["shovel"], Player.Backpack)
@@ -36,6 +37,7 @@ class Mining():
                     while not (Journal.Search(journal_strings_mining["noMetal"]) or Journal.Search(
                             journal_strings_mining["youcant"]) or Journal.Search(journal_strings_mining["cantseen"])):
                         self.CheckWeight()
+                        self.CheckForEnemies()
                         shovel = FindItem(tool_ids["shovel"], Player.Backpack)
                         Target.TargetResource(shovel, "ore")
                         Misc.Pause(self.options["mining_delay"])
@@ -109,7 +111,28 @@ class Mining():
                                 Items.Move(item, Misc.ReadSharedValue(ore_bag_serial_name), 0)
                                 Misc.Pause(1000)
         self.current_runebook.recall(str(self.location))
-
+    def CheckForEnemies(self):
+        enemies = Mobiles.ApplyFilter(filterEnemy())
+        if debug:
+            print("{} Enemies nearby".format(len(enemies)))
+        Timer.Create('Fight', 2500)
+        for enemy in enemies:
+            enemyMobile = Mobiles.FindBySerial(enemy.Serial)
+            if debug:
+                print(enemyMobile.Name)
+            if enemyMobile:
+                if Player.DistanceTo(enemyMobile) > 1:
+                    enemyPosition = enemyMobile.Position
+                    enemyCoords = PathFinding.Route()
+                    enemyCoords.MaxRetry = 5
+                    enemyCoords.StopIfStuck = False
+                    enemyCoords.X = enemyMobile.Position.X
+                    enemyCoords.Y = enemyMobile.Position.Y - 1
+                    PathFinding.Go(enemyCoords)
+                    Misc.ScriptRun(self.options['attack_script_name'])
+                elif Timer.Check('Fight') == False:
+                    Misc.ScriptRun(self.options['attack_script_name'])
+                    Timer.Create('Fight', 2500)
     def Start(self):
         Journal.Clear()
         random.shuffle(self.runebooks)
@@ -117,6 +140,7 @@ class Mining():
         for runebookId in self.runebooks:
             self.current_runebook = Runebook(runebookId)
             self.CheckWeight()
+            self.CheckForEnemies()
             while True:
                 next = str(self.location)
                 didRecall = self.current_runebook.recall(next)

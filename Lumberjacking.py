@@ -1,12 +1,10 @@
 from math import sqrt
 
-from Eclipse.Common import debug, drag_delay, wait_for_target_timeout, filterEnemy, FillFromMasterKey
+from Eclipse.Common import debug, drag_delay, wait_for_target_timeout, filterEnemy, FillFromMasterKey, weight_limit, left_hand_layer, right_hand_layer
 from Eclipse.Resources import default_lj_options, lumberjacking, log_bag_serial_name, journal_strings_lumberjacking
 from Eclipse.Runebook import Runebook
 
-weight_limit = Player.MaxWeight * 0.95
-left_hand_layer = 'LeftHand'
-right_hand_layer = 'RightHand'
+
 chop_timer_delay = 10000
 
 

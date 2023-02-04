@@ -1,6 +1,7 @@
 from Eclipse.Mining import Mining
 
 optionsOverride = {
+    'attack_script_name': 'ExampleAttackScript.py',
     'mining_delay': 1050,
     'deposit_in_bank': False,
     'fill_with_master_key': True,

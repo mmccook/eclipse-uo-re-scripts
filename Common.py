@@ -18,7 +18,8 @@ tool_ids = {
     'hatchet': 0x0F43,
     'tinker_tool': 0x1EB8,
     'runechisel': 0x10E7,
-    'portable_smelter': 0x0FB1
+    'portable_smelter': 0x0FB1,
+    'fishing_pole': 0x0DC0
 }
 ## Keys
 key_ids = {
@@ -26,7 +27,9 @@ key_ids = {
 }
 drag_delay = 1050
 wait_for_target_timeout = 10000
-
+weight_limit = Player.MaxWeight * 0.95
+left_hand_layer = 'LeftHand'
+right_hand_layer = 'RightHand'
 
 def FillFromMasterKey():
     try:

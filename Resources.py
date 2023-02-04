@@ -24,6 +24,7 @@ ore_bag_serial_name = 'oreBagSerial'
 ingot_bag_serial_name = 'ingotBagSerial'
 
 default_options = {
+    'attack_script_name': 'ExampleAttackScript.py',
     'mining_delay': 1050,
     'deposit_in_bank': False,
     'fill_with_master_key': True,
