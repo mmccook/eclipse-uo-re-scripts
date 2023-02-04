@@ -1,11 +1,9 @@
 import random
-
 from Eclipse.Common import debug, tool_ids, FillFromMasterKey, filterEnemy
 from Eclipse.Items import FindItem
 from Eclipse.Resources import ore_bag_serial_name, ingot_bag_serial_name, static_runebooks_serial, default_options, \
     mining, journal_strings_mining
 from Eclipse.Runebook import Runebook
-
 
 class Mining():
     location = 1
@@ -112,22 +110,32 @@ class Mining():
                                 Misc.Pause(1000)
         self.current_runebook.recall(str(self.location))
     def CheckForEnemies(self):
+        if Target.HasTarget():
+            if (debug):
+                Misc.SendMessage('--> Detected block, canceling target!', 77)
+            Target.Cancel()
+            Misc.Pause(500)
         enemies = Mobiles.ApplyFilter(filterEnemy())
-        if debug:
-            print("{} Enemies nearby".format(len(enemies)))
-        Timer.Create('Fight', 2500)
-        for enemy in enemies:
-            enemyMobile = Mobiles.FindBySerial(enemy.Serial)
+        while len(enemies) > 0:
             if debug:
-                print(enemyMobile.Name)
-            if enemyMobile:
-                if Player.DistanceTo(enemyMobile) > 1:
-                    if Misc.ScriptStatus(self.options['attack_script_name']):
-                        Misc.ScriptRun(self.options['attack_script_name'])
-                elif Timer.Check('Fight') == False:
-                    if Misc.ScriptStatus(self.options['attack_script_name']):
-                        Misc.ScriptRun(self.options['attack_script_name'])
-                    Timer.Create('Fight', 2500)
+                print("{} Enemies nearby".format(len(enemies)))
+            Timer.Create('Fight', 2500)
+            for enemy in enemies:
+                enemyMobile = Mobiles.FindBySerial(enemy.Serial)
+                if enemyMobile:
+                    if debug:
+                        print(enemyMobile.Name)
+                    if Player.DistanceTo(enemyMobile) > 1:
+                        if not Misc.ScriptStatus('ExampleAttackScript.py'):
+                            Misc.ScriptRun('ExampleAttackScript.py')
+                            Misc.Pause(2500)
+                    elif Timer.Check('Fight') == False:
+                        if not Misc.ScriptStatus('ExampleAttackScript.py'):
+                            Misc.ScriptRun('ExampleAttackScript.py')
+                            Misc.Pause(2500)
+                            Timer.Create('Fight', 2500)
+            Misc.Pause(1000)
+            enemies = Mobiles.ApplyFilter(filterEnemy())
     def Start(self):
         Journal.Clear()
         random.shuffle(self.runebooks)
